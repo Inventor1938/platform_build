@@ -210,12 +210,6 @@ $(info ************************************************************)
 $(error stop)
 endif
 
-KNOWN_INCOMPATIBLE_JAVAC_VERSIONS := google
-incompat_javac := $(foreach v,$(KNOWN_INCOMPATIBLE_JAVAC_VERSIONS),$(findstring $(v),$(javac_version_str)))
-ifneq ($(incompat_javac),)
-javac_version :=
-endif
-
 # Check for the correct version of javac
 ifeq ($(strip $(javac_version)),)
 $(info ************************************************************)

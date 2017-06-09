@@ -186,6 +186,7 @@ LOCAL_CLANG_EXCEPTION_PROJECTS := \
   device/lge/bullhead/ \
   external/valgrind/ \
   hardware/qcom/ \
+  bionic/tests/ \
   $(INTERNAL_LOCAL_CLANG_EXCEPTION_PROJECTS)
 
 # Find $1 in the exception project list.

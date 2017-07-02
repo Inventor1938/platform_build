@@ -27,6 +27,8 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
     qcom_flags += -DQCOM_BSP
     qcom_flags += -DQTI_BSP
 
+    BOARD_USES_ADRENO := true
+
     TARGET_USES_QCOM_BSP := true
 
     # Tell HALs that we're compiling an AOSP build with an in-line kernel
@@ -46,6 +48,14 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
     ifneq ($(filter msm8992 msm8994,$(TARGET_BOARD_PLATFORM)),)
         qcom_flags += -DHAS_EXTRA_FLAC_METADATA
     endif
+
+    # Enable color metadata for 8xx UM targets
+    ifneq ($(filter msm8996 msm8998,$(TARGET_BOARD_PLATFORM)),)
+        TARGET_USES_COLOR_METADATA := true
+    endif
+
+    # List of targets that use master side content protection
+    MASTER_SIDE_CP_TARGET_LIST := msm8996 msm8998
 
     TARGET_GLOBAL_CFLAGS += $(qcom_flags)
     TARGET_GLOBAL_CPPFLAGS += $(qcom_flags)
@@ -78,30 +88,9 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
         endif
     endif
 
-# HACK: check to see if build uses standard QC HAL paths by checking for CM path structure
-AOSP_VARIANT_MAKEFILE := $(wildcard hardware/qcom/audio/default/Android.mk)
-ifeq ("$(AOSP_VARIANT_MAKEFILE)","")
-$(call project-set-path,qcom-audio,hardware/qcom/audio)
-$(call project-set-path,qcom-display,hardware/qcom/display)
-$(call project-set-path,qcom-media,hardware/qcom/media)
-$(call set-device-specific-path,CAMERA,camera,hardware/qcom/camera)
-$(call set-device-specific-path,GPS,gps,hardware/qcom/gps)
-$(call set-device-specific-path,SENSORS,sensors,hardware/qcom/sensors)
-$(call set-device-specific-path,LOC_API,loc-api,vendor/qcom/opensource/location)
-$(call set-device-specific-path,DATASERVICES,dataservices,vendor/qcom/opensource/dataservices)
-$(call project-set-path,ril,hardware/ril)
-$(call project-set-path,wlan,hardware/qcom/wlan)
-$(call project-set-path,bt-vendor,hardware/qcom/bt)
-else
 $(call project-set-path,qcom-audio,hardware/qcom/audio-caf/$(QCOM_HARDWARE_VARIANT))
-
-ifeq ($(SONY_BF64_KERNEL_VARIANT),true)
-$(call project-set-path,qcom-display,hardware/qcom/display-caf/sony)
-$(call project-set-path,qcom-media,hardware/qcom/media-caf/sony)
-else
 $(call project-set-path,qcom-display,hardware/qcom/display-caf/$(QCOM_HARDWARE_VARIANT))
 $(call project-set-path,qcom-media,hardware/qcom/media-caf/$(QCOM_HARDWARE_VARIANT))
-endif
 
 $(call set-device-specific-path,CAMERA,camera,hardware/qcom/camera)
 $(call set-device-specific-path,GPS,gps,hardware/qcom/gps)
@@ -112,13 +101,12 @@ $(call set-device-specific-path,DATASERVICES,dataservices,vendor/qcom/opensource
 $(call ril-set-path-variant,ril)
 $(call wlan-set-path-variant,wlan-caf)
 $(call bt-vendor-set-path-variant,bt-caf)
-endif # AOSP_VARIANT_MAKEFILE
 
 else
 
 $(call project-set-path,qcom-audio,hardware/qcom/audio/default)
 $(call project-set-path,qcom-display,hardware/qcom/display/$(TARGET_BOARD_PLATFORM))
-$(call project-set-path,qcom-media,hardware/qcom/media)
+$(call project-set-path,qcom-media,hardware/qcom/media/$(TARGET_BOARD_PLATFORM))
 
 $(call project-set-path,qcom-camera,hardware/qcom/camera)
 $(call project-set-path,qcom-gps,hardware/qcom/gps)
